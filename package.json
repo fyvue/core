@@ -1,0 +1,14 @@
+{
+    "name": "@fy-/core",
+    "version": "0.0.1",
+    "author": "Florian 'Fy' Gasquez <m@fy.to>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fyvue/core.git"
+    },
+    "bugs": {
+        "url": "https://github.com/fyvue/core/issues"
+    },
+    "homepage": "https://github.com/fyvue/core#readme"
+}

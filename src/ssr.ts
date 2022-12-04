@@ -57,7 +57,7 @@ export function getServerInitialState() {
 export function initVueClient(router: Router, pinia: Pinia) {
   const state = getServerInitialState();
   if (isServerRendered() && state && state.pinia) {
-    pinia.state.value = state.pinia;
+    pinia.state.value = JSON.parse(state.pinia);
   }
   useServerRouter(pinia)._setRouter(router);
 }

@@ -10,6 +10,17 @@ import {
   getServerInitialState,
   isServerRendered,
 } from "./ssr";
+import {
+  cropText,
+  formatBytes,
+  formatTimeago,
+  formatDatetime,
+  jpZipcode,
+  formatRecurringPaymentCycle,
+  formatDate,
+} from "./templating";
+
+import { ClientOnly } from "./components/ClientOnly";
 
 function createFyCore(): Plugin {
   const eventBus: EventBus = mitt<Events>();
@@ -24,6 +35,18 @@ function createFyCore(): Plugin {
         // i18next
         app.config.globalProperties.$t = i18next.t;
         app.provide("fyTranslate", i18next.t);
+
+        // Templating
+        app.config.globalProperties.$cropText = cropText;
+        app.config.globalProperties.$formatBytes = formatBytes;
+        app.config.globalProperties.$formatTimeago = formatTimeago;
+        app.config.globalProperties.$formatDatetime = formatDatetime;
+        app.config.globalProperties.$jpZipcode = jpZipcode;
+        app.config.globalProperties.$formatKlbRecurringPaymentCycle =
+          formatRecurringPaymentCycle; // fyvue < 0.2
+        app.config.globalProperties.$formatRecurringPaymentCycle =
+          formatRecurringPaymentCycle;
+        app.config.globalProperties.$formatDate = formatDate;
       }
     },
   };
@@ -60,8 +83,18 @@ function i18nextPromise(
   });
 }
 
+const componentsList = ["ClientOnly"];
+
+const fycoreResolver = (componentName: string) => {
+  if (componentsList.includes(componentName))
+    return { name: componentName, from: "@fy-/core" };
+};
+
 export {
   createFyCore,
+  fycoreResolver,
+  // Components
+  ClientOnly,
   // Core:
   useTranslation,
   useEventBus,
@@ -72,11 +105,30 @@ export {
   SSRRender,
   initVueClient,
   isServerRendered,
+  // Formatting
+  cropText,
+  formatBytes,
+  formatTimeago,
+  formatDatetime,
+  jpZipcode,
+  formatRecurringPaymentCycle,
+  formatDate,
 };
 
 declare module "vue" {
-  interface ComponentCustomProperties {
+  export interface ComponentCustomProperties {
     $t: I18nextTranslate;
     $eventBus: EventBus;
+    $cropText: typeof cropText;
+    $formatBytes: typeof formatBytes;
+    $formatTimeago: typeof formatTimeago;
+    $formatDatetime: typeof formatDatetime;
+    $jpZipcode: typeof jpZipcode;
+    $formatKlbRecurringPaymentCycle: typeof formatRecurringPaymentCycle; // fyvue < 0.2
+    $formatRecurringPaymentCycle: typeof formatRecurringPaymentCycle;
+    $formatDate: typeof formatDate;
+  }
+  export interface GlobalComponents {
+    ClientOnly: typeof ClientOnly;
   }
 }

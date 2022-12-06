@@ -6,6 +6,7 @@ import path from "path";
 const config: UserConfig = {
   plugins: [
     vue(),
+    // @ts-ignore
     copy({
       targets: [
         {
@@ -50,6 +51,7 @@ const config: UserConfig = {
         "vue-router",
         "pinia",
         "@vue/server-renderer",
+        "timeago.js",
       ],
       output: {
         exports: "named",
@@ -60,7 +62,8 @@ const config: UserConfig = {
           "@vue/compiler-dom": "VueCompilerDOM",
           i18next: "i18next",
           pinia: "pinia",
-          "vue-router": "vr",
+          "vue-router": "vueRouter",
+          "timeago.js": "timeago",
         },
       },
     },

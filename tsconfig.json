@@ -15,7 +15,7 @@
     ],
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "./dist/types",
+    //"declarationDir": "./dist/types",
     "isolatedModules": true,
     "skipLibCheck": true,
     "types": [

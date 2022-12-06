@@ -1,8 +1,8 @@
 import type { App, Plugin } from "vue";
 import { inject } from "vue";
-import mitt, { Emitter } from "mitt";
+import mitt from "mitt";
 import i18next, { BackendModule } from "i18next";
-import type { Events } from "./types";
+import type { Events, I18nextTranslate, EventBus } from "./types";
 import {
   useServerRouter,
   SSRRender,
@@ -12,7 +12,7 @@ import {
 } from "./ssr";
 
 function createFyCore(): Plugin {
-  const eventBus: Emitter<Events> = mitt<Events>();
+  const eventBus: EventBus = mitt<Events>();
 
   return {
     install(app: App) {
@@ -30,7 +30,7 @@ function createFyCore(): Plugin {
 }
 
 function useEventBus() {
-  const eventBus = inject<Emitter<Events>>("fyEventBus");
+  const eventBus = inject<EventBus>("fyEventBus");
 
   if (!eventBus) throw new Error("Did you apply app.use(fycore)?");
 
@@ -38,8 +38,7 @@ function useEventBus() {
 }
 
 function useTranslation() {
-  const translate =
-    inject<(key: string, v?: any | undefined) => string>("fyTranslate");
+  const translate = inject<I18nextTranslate>("fyTranslate");
   if (!translate) throw new Error("Did you apply app.use(fycore)?");
 
   return translate;
@@ -74,3 +73,10 @@ export {
   initVueClient,
   isServerRendered,
 };
+
+declare module "vue" {
+  interface ComponentCustomProperties {
+    $t: I18nextTranslate;
+    $eventBus: EventBus;
+  }
+}

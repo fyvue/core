@@ -1,3 +1,5 @@
+import type { Emitter } from "mitt";
+
 export type Events = {
   [key: string]: any;
 };
@@ -21,3 +23,5 @@ export interface ServerRouterState {
   status: number;
   redirect?: string;
 }
+export type I18nextTranslate = (key: string, v?: any | undefined) => string;
+export type EventBus = Emitter<Events>;

@@ -1,8 +1,7 @@
 import type { UserConfig } from "vite";
 import copy from "rollup-plugin-copy";
 import vue from "@vitejs/plugin-vue";
-
-const path = require("path");
+import path from "path";
 
 const config: UserConfig = {
   plugins: [
@@ -17,6 +16,8 @@ const config: UserConfig = {
             // @ts-ignore
             let _contents = contents.toString().replaceAll("./dist/", "./");
             _contents = _contents.replaceAll("dist/", "");
+            //_contents = _contents.replaceAll("types.ts", "types.d.ts");
+
             _contents = _contents
               .toString()
               .replaceAll(

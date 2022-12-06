@@ -1,13 +1,12 @@
 {
     "name": "@fy-/core",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": "Florian 'Fy' Gasquez <m@fy.to>",
     "license": "MIT",
     "main": "dist/fycore.cjs.js",
     "module": "dist/fycore.es.js",
     "typings": "dist/index.d.ts",
     "types": "dist/index.d.ts",
-    "type": "module",
     "exports": {
         ".": {
             "import": "./dist/fycore.es.js",

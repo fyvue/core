@@ -1,7 +1,114 @@
 import { defineStore, Pinia } from "pinia";
 import { renderToString } from "@vue/server-renderer";
-import type { SSRBase, ServerRouterState } from "./types";
+import type {
+  SSRBase,
+  ServerRouterState,
+  FetchSharedState,
+  FetchRequestResult,
+  FetchResult,
+} from "./types";
 import type { Router } from "vue-router";
+
+export const stringHashcode = (str: string) => {
+  let hash = 0,
+    i,
+    chr;
+  if (str.length === 0) return hash;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+export const useFetchState = defineStore({
+  id: "fetchState",
+  state: (): FetchSharedState => ({
+    results: {},
+  }),
+  actions: {
+    addResult(key: number, result: FetchResult) {
+      this.results[key] = result;
+    },
+    delResult(key: number) {
+      delete this.results[key];
+    },
+    getByHash(key: number) {
+      return this.results[key];
+    },
+  },
+});
+
+export function fyvueFetch<ResultType extends FetchResult>(
+  url: string,
+  method: string = "GET",
+  params: object = {}
+): Promise<ResultType> {
+  const fetchState = useFetchState();
+  const requestHash = stringHashcode(url + method + JSON.stringify(params));
+
+  if (isServerRendered() && fetchState.results[requestHash]) {
+    const result = { ...fetchState.results[requestHash] } as ResultType;
+    delete fetchState.results[requestHash];
+    return new Promise<ResultType>((resolve, reject) => {
+      if (result.fvReject) {
+        delete result.fvReject;
+        reject(result);
+      } else resolve(result);
+    });
+  }
+
+  const headers = new Headers();
+  headers.set("Content-Type", "application/json");
+  let _params: any = params;
+  if (method == "POST") {
+    _params = JSON.stringify(params);
+  } else if (method == "GET") {
+    _params = undefined;
+    if (params) {
+      _params = "?" + new URLSearchParams(params as Record<string, string>);
+    }
+  }
+  return new Promise<ResultType>((resolve, reject) => {
+    fetch(`${url}${method == "GET" ? _params : ""}`, {
+      method: method,
+      body: method == "POST" ? _params : undefined,
+      headers,
+    })
+      .catch((err) => {
+        const _res: FetchResult = {
+          raw: err,
+          data: err,
+          status: err.status,
+        };
+        // @ts-ignore
+        if (getMode() == "ssr") {
+          _res.fvReject = true;
+          fetchState.results[requestHash] = _res;
+        }
+        reject(_res as ResultType);
+      })
+      .then((res) => {
+        if (res) {
+          const _res: FetchResult = {
+            raw: res,
+            data: undefined,
+            status: res.status,
+          };
+
+          res.json().then((data: ResultType) => {
+            _res.data = data;
+            // @ts-ignore
+            if (getMode() == "ssr") {
+              fetchState.results[requestHash] = _res;
+            }
+            resolve(_res as ResultType);
+          });
+        }
+      });
+  });
+}
 
 export const useServerRouter = defineStore({
   id: "routerStore",
@@ -52,6 +159,10 @@ export function isServerRendered() {
 export function getServerInitialState() {
   // @ts-ignore
   return typeof FW !== "undefined" ? FW.initial : undefined;
+}
+export function getMode() {
+  // @ts-ignore
+  return typeof FW !== "undefined" ? FW.mode : undefined;
 }
 
 export function initVueClient(router: Router, pinia: Pinia) {

@@ -4,23 +4,10 @@ import type {
   SSRBase,
   ServerRouterState,
   FetchSharedState,
-  FetchRequestResult,
   FetchResult,
 } from "./types";
 import type { Router } from "vue-router";
-
-export const stringHashcode = (str: string) => {
-  let hash = 0,
-    i,
-    chr;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
+import { stringHash } from "./helpers";
 
 export const useFetchState = defineStore({
   id: "fetchState",
@@ -46,11 +33,11 @@ export function fyvueFetch<ResultType extends FetchResult>(
   params: object = {}
 ): Promise<ResultType> {
   const fetchState = useFetchState();
-  const requestHash = stringHashcode(url + method + JSON.stringify(params));
-
-  if (isServerRendered() && fetchState.results[requestHash]) {
-    const result = { ...fetchState.results[requestHash] } as ResultType;
-    delete fetchState.results[requestHash];
+  const requestHash = stringHash(url + method + JSON.stringify(params));
+  const hasResult = fetchState.getByHash(requestHash);
+  if (isServerRendered() && hasResult) {
+    const result = { ...hasResult } as ResultType;
+    fetchState.delResult(requestHash);
     return new Promise<ResultType>((resolve, reject) => {
       if (result.fvReject) {
         delete result.fvReject;
@@ -70,6 +57,27 @@ export function fyvueFetch<ResultType extends FetchResult>(
       _params = "?" + new URLSearchParams(params as Record<string, string>);
     }
   }
+
+  /*export function responseParse(response, resolve, reject) {
+  var contentType = response.headers.get("content-type");
+  if (!contentType || contentType.indexOf("application/json") == -1) {
+    response
+      .text()
+      .then((text) => {
+        reject({ message: "Not JSON", body: text, headers: response.headers });
+      }, reject)
+      .catch(reject);
+
+    return;
+  }
+
+  response
+    .json()
+    .then((json) => {
+      resolve(json);
+    }, reject)
+    .catch(reject);
+}*/
   return new Promise<ResultType>((resolve, reject) => {
     fetch(`${url}${method == "GET" ? _params : ""}`, {
       method: method,
@@ -77,34 +85,53 @@ export function fyvueFetch<ResultType extends FetchResult>(
       headers,
     })
       .catch((err) => {
-        const _res: FetchResult = {
-          raw: err,
-          data: err,
-          status: err.status,
-        };
-        // @ts-ignore
-        if (getMode() == "ssr") {
-          _res.fvReject = true;
-          fetchState.results[requestHash] = _res;
-        }
-        reject(_res as ResultType);
+        console.log("fetchError: ", err);
+        reject({
+          headers: {},
+          data: { message: "fetchError", error: true },
+          status: 500,
+        });
       })
       .then((res) => {
         if (res) {
-          const _res: FetchResult = {
-            raw: res,
-            data: undefined,
-            status: res.status,
-          };
-
-          res.json().then((data: ResultType) => {
-            _res.data = data;
-            // @ts-ignore
-            if (getMode() == "ssr") {
-              fetchState.results[requestHash] = _res;
-            }
-            resolve(_res as ResultType);
-          });
+          const contentType = res.headers.get("content-type");
+          if (!contentType || contentType.indexOf("application/json") == -1) {
+            console.log("fetchError: notJSON");
+            reject({
+              headers: {},
+              data: { message: "fetchError: notJSON", error: true },
+              status: 500,
+            });
+          } else {
+            const xHeaders: { [key: string]: string } = {};
+            res.headers.forEach((v: string, k: string) => {
+              if (k.startsWith("x-")) xHeaders[k] = v;
+            });
+            res
+              .json()
+              .then((v) => {
+                const _res: FetchResult = {
+                  headers: xHeaders,
+                  data: v,
+                  status: res.status,
+                };
+                if (getMode() == "ssr") {
+                  fetchState.addResult(requestHash, _res);
+                }
+                resolve(_res as ResultType);
+              })
+              .catch((e) => {
+                console.log("fetchError: jsonError" + ` (${e}) `);
+                reject({
+                  headers: xHeaders,
+                  data: {
+                    message: "fetchError: jsonError" + ` (${e}) `,
+                    error: true,
+                  },
+                  status: 500,
+                });
+              });
+          }
         }
       });
   });
@@ -168,7 +195,7 @@ export function getMode() {
 export function initVueClient(router: Router, pinia: Pinia) {
   const state = getServerInitialState();
   if (isServerRendered() && state && state.pinia) {
-    pinia.state.value = JSON.parse(state.pinia);
+    pinia.state.value = state.pinia;
   }
   useServerRouter(pinia)._setRouter(router);
 }
@@ -221,7 +248,8 @@ export async function SSRRender(
         result.statusCode = serverRouter.status;
       }
     }
-    result.initial.pinia = JSON.stringify(pinia.state.value);
+    serverRouter._router = null;
+    result.initial.pinia = pinia.state.value;
     cb(result);
     return result;
   } catch (e) {

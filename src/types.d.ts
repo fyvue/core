@@ -27,7 +27,9 @@ export interface FetchResult {
   [key: string]: any;
   fvReject?: boolean;
   data?: any;
-  raw: any;
+  headers: {
+    [key: string]: string;
+  };
   status: any;
 }
 export type FetchRequestResult = {

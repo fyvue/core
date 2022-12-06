@@ -21,6 +21,7 @@ import {
   formatRecurringPaymentCycle,
   formatDate,
 } from "./templating";
+import { generateUUID, stringHash } from "./helpers";
 
 import { ClientOnly } from "./components/ClientOnly";
 
@@ -117,6 +118,9 @@ export {
   jpZipcode,
   formatRecurringPaymentCycle,
   formatDate,
+  // Helpers
+  generateUUID,
+  stringHash,
 };
 
 declare module "vue" {

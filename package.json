@@ -1,6 +1,6 @@
 {
     "name": "@fy-/core",
-    "version": "0.0.4",
+    "version": "0.0.13",
     "author": "Florian 'Fy' Gasquez <m@fy.to>",
     "license": "MIT",
     "main": "dist/fycore.cjs.js",

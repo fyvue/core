@@ -50,6 +50,9 @@ function createFyCore(): Plugin {
         app.config.globalProperties.$formatRecurringPaymentCycle =
           formatRecurringPaymentCycle;
         app.config.globalProperties.$formatDate = formatDate;
+
+        // Components
+        app.component("ClientOnly", ClientOnly);
       }
     },
   };

@@ -57,27 +57,7 @@ export function fyvueFetch<ResultType extends FetchResult>(
       _params = "?" + new URLSearchParams(params as Record<string, string>);
     }
   }
-
-  /*export function responseParse(response, resolve, reject) {
-  var contentType = response.headers.get("content-type");
-  if (!contentType || contentType.indexOf("application/json") == -1) {
-    response
-      .text()
-      .then((text) => {
-        reject({ message: "Not JSON", body: text, headers: response.headers });
-      }, reject)
-      .catch(reject);
-
-    return;
-  }
-
-  response
-    .json()
-    .then((json) => {
-      resolve(json);
-    }, reject)
-    .catch(reject);
-}*/
+  
   return new Promise<ResultType>((resolve, reject) => {
     fetch(`${url}${method == "GET" ? _params : ""}`, {
       method: method,

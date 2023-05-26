@@ -22,6 +22,9 @@ const formatRecurringPaymentCycle = (cycle?: string): string => {
     case "h":
       return translate("payment_cycles_hour", { count: quantity });
       break;
+    case "w":
+      return translate("payment_cycles_week", { count: quantity });
+      break;
     case "d":
       return translate("payment_cycles_day", { count: quantity });
       break;

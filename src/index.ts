@@ -9,8 +9,6 @@ import {
   initVueClient,
   getServerInitialState,
   isServerRendered,
-  useFetchState,
-  fyvueFetch,
 } from "./ssr";
 import {
   cropText,
@@ -111,8 +109,6 @@ export {
   SSRRender,
   initVueClient,
   isServerRendered,
-  useFetchState,
-  fyvueFetch,
   // Formatting
   cropText,
   formatBytes,

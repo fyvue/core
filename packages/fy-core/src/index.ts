@@ -19,7 +19,7 @@ import {
   formatRecurringPaymentCycle,
   formatDate,
 } from "./templating";
-import { generateUUID, stringHash } from "./helpers";
+import { generateUUID, stringHash, removeUndefinedStrings } from "./helpers";
 
 import { ClientOnly } from "./components/ClientOnly";
 
@@ -120,6 +120,7 @@ export {
   // Helpers
   generateUUID,
   stringHash,
+  removeUndefinedStrings,
 };
 
 declare module "vue" {

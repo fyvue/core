@@ -1,5 +1,5 @@
 import type { Emitter } from "mitt";
-
+import type { TFunction } from "i18next";
 export type Events = {
   [key: string]: any;
 };
@@ -39,5 +39,5 @@ export type FetchRequestResult = {
 export type FetchSharedState = {
   results: FetchRequestResult;
 };
-export type I18nextTranslate = (key: string, v?: any | undefined) => string;
+export type I18nextTranslate = TFunction<string[], undefined, string>;
 export type EventBus = Emitter<Events>;

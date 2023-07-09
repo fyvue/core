@@ -1,8 +1,9 @@
-# packages
-packages/fy-sitemap
-
+dist/
+src/styles/__*
+src/components.d.ts
 # yarn
-
+.rollup.*
+.pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

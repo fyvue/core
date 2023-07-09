@@ -1,0 +1,54 @@
+{
+    "name": "@fy-/core",
+    "version": "0.0.16",
+    "author": "Florian 'Fy' Gasquez <m@fy.to>",
+    "license": "MIT",
+    "main": "dist/fycore.cjs.js",
+    "module": "dist/fycore.es.js",
+    "typings": "dist/index.d.ts",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/fycore.es.js",
+            "require": "./dist/fycore.cjs.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fyvue/core.git"
+    },
+    "bugs": {
+        "url": "https://github.com/fyvue/core/issues"
+    },
+    "homepage": "https://github.com/fyvue/core#readme",
+    "peerDependencies": {
+        "i18next": "^22.0.x",
+        "pinia": "^2.0.x",
+        "timeago.js": "^4.0.x",
+        "vue": "^3.2.x",
+        "vue-router": "^4.1.x"
+    },
+    "scripts": {
+        "build": "rm -rf dist/ && vite build --mode development && vue-tsc  --declaration --emitDeclarationOnly --emitDeclarationOnly --outdir ./dist",
+        "lint:check": "eslint src/ --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.1",
+        "@vitejs/plugin-vue": "^4.2.3",
+        "@vue/compiler-sfc": "^3.3.4",
+        "@vue/server-renderer": "^3.3.4",
+        "eslint": "^8.44.0",
+        "i18next": "^23.2.8",
+        "mitt": "^3.0.1",
+        "pinia": "^2.1.4",
+        "rollup": "^3.26.2",
+        "rollup-plugin-copy": "^3.4.0",
+        "timeago.js": "^4.0.2",
+        "typescript": "^5.1.6",
+        "vite": "^4.4.2",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4",
+        "vue-tsc": "^1.8.4"
+    }
+}

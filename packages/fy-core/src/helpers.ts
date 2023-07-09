@@ -30,3 +30,18 @@ export function stringHash(str: string) {
   }
   return hash + 2147483647 + 1;
 }
+
+export const removeUndefinedStrings = (
+  input: any,
+  undefinedValues: string[] = ["undefined"]
+) => {
+  const output: any = {};
+
+  Object.keys(input).forEach((key) => {
+    if (!undefinedValues.includes(input[key]) && input[key] !== undefined) {
+      output[key] = input[key];
+    }
+  });
+
+  return output;
+};

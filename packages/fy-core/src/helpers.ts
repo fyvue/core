@@ -33,7 +33,7 @@ export function stringHash(str: string) {
 
 export const removeUndefinedStrings = (
   input: any,
-  undefinedValues: string[] = ["undefined"]
+  undefinedValues: any[] = ["undefined"]
 ) => {
   const output: any = {};
 

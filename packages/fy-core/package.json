@@ -1,6 +1,6 @@
 {
     "name": "@fy-/core",
-    "version": "0.0.16",
+    "version": "0.0.18",
     "author": "Florian 'Fy' Gasquez <m@fy.to>",
     "license": "MIT",
     "main": "dist/fycore.cjs.js",
@@ -23,11 +23,11 @@
     },
     "homepage": "https://github.com/fyvue/core#readme",
     "peerDependencies": {
-        "i18next": "^22.0.x",
-        "pinia": "^2.0.x",
-        "timeago.js": "^4.0.x",
-        "vue": "^3.2.x",
-        "vue-router": "^4.1.x"
+        "i18next": "^23.x.x",
+        "pinia": "^2.x.x",
+        "timeago.js": "^4.x.x",
+        "vue": "^3.x.x",
+        "vue-router": "^4.x.x"
     },
     "scripts": {
         "build": "rm -rf dist/ && vite build --mode development && vue-tsc  --declaration --emitDeclarationOnly --emitDeclarationOnly --outdir ./dist",
